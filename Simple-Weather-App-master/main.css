@@ -1,95 +1,291 @@
-* {
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&display=swap');
+
+*, *::before, *::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-body {
-  font-family: 'montserrat', sans-serif;
-  background-image: url('bg.jpg');
-  background-size: cover;
-  background-position: top center;
+:root {
+  --glass: rgba(255, 255, 255, 0.07);
+  --glass-border: rgba(255, 255, 255, 0.15);
+  --glass-shine: rgba(255, 255, 255, 0.25);
+  --text: #ffffff;
+  --text-dim: rgba(255,255,255,0.65);
+  --accent: #00e5ff;
 }
 
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: radial-gradient(ellipse at 50% -20%, #280a3c 0%, #0a050f 55%, #050308 100%);
+  color: var(--text);
+  transition: background 2s ease;
+  position: relative;
+}
+
+/* ─── DYNAMIC SKY BACKGROUNDS ─── */
+body.clear {
+  background: radial-gradient(ellipse at 50% -10%, #0a2a6e 0%, #1565c0 30%, #1e88e5 60%, #e3a634 100%);
+}
+body.clouds {
+  background: radial-gradient(ellipse at 50% 0%, #4a5568 0%, #2d3748 50%, #1a202c 100%);
+}
+body.rain {
+  background: radial-gradient(ellipse at 40% -10%, #0d2137 0%, #1a3a5c 40%, #1e4976 100%);
+}
+body.drizzle {
+  background: radial-gradient(ellipse at 40% 0%, #1a2f45 0%, #243b55 50%, #2c5364 100%);
+}
+body.snow {
+  background: radial-gradient(ellipse at 50% -10%, #7b9cbf 0%, #c5d8ec 40%, #ddeeff 100%);
+}
+body.thunderstorm {
+  background: radial-gradient(ellipse at 30% -10%, #0a0f1e 0%, #151f35 40%, #1e2d45 100%);
+}
+body.mist, body.fog, body.haze {
+  background: radial-gradient(ellipse at 50% 0%, #4a5568 0%, #606878 50%, #777e8a 100%);
+}
+body.sunny {
+  background: radial-gradient(ellipse at 50% -20%, #0047ab 0%, #0065cc 40%, #e8a020 100%);
+}
+
+/* ─── CANVAS ─── */
+#weatherCanvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ─── APP WRAP ─── */
 .app-wrap {
+  position: relative;
+  z-index: 10;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3));
 }
 
+/* ─── HEADER ─── */
 header {
   display: flex;
   justify-content: center;
-  align-items: center;
-  padding: 50px 15px 15px;
+  padding: 48px 20px 16px;
 }
 
-header input {
+/* ─── SEARCH BOX ─── */
+.search-box {
   width: 100%;
-  max-width: 280px;
-  padding: 10px 15px;
-  border: none;
+  max-width: 320px;
+  padding: 14px 22px;
+  background: var(--glass);
+  border: 1.5px solid var(--glass-border);
+  border-radius: 50px;
+  color: #fff;
+  font-family: 'Outfit', sans-serif;
+  font-size: 15px;
+  font-weight: 400;
   outline: none;
-  background-color: rgba(255, 255, 255, 0.3);
-  border-radius: 0px 16px 0px 16px;
-  border-bottom: 3px solid gray;
-
-  color: #313131;
-  font-size: 20px;
-  font-weight: 300;
-  transition: 0.2s ease-out;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 0 0 rgba(0,229,255,0);
+  /* Animated gradient border */
+  background-clip: padding-box;
 }
 
-header input:focus {
-  background-color: rgba(255, 255, 255, 0.6);
+.search-box::placeholder {
+  color: rgba(255,255,255,0.45);
 }
 
+.search-box:hover {
+  border-color: rgba(0,229,255,0.4);
+  background: rgba(255,255,255,0.1);
+  box-shadow: 0 0 20px rgba(0,229,255,0.2);
+}
+
+.search-box:focus {
+  border-color: var(--accent);
+  background: rgba(0,229,255,0.06);
+  box-shadow: 0 0 0 4px rgba(0,229,255,0.12), 0 0 30px rgba(0,229,255,0.25);
+  transform: scale(1.02);
+}
+
+/* ─── MAIN ─── */
 main {
-  flex: 1 1 100%;
-  padding: 25px 25px 50px;
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  padding: 20px;
   text-align: center;
+  gap: 10px;
+}
+
+/* ─── CITY BOX ─── */
+/* ─── CITY BOX ─── */
+.city-box {
+  position: relative;
+  padding: 2px;
+  border-radius: 24px;
+  margin-bottom: 8px;
+  animation: floatY 7s ease-in-out infinite;
+  background: rgba(255, 255, 255, 0.08); /* static border color */
+  overflow: hidden;
+}
+
+/* Sliding beam */
+.city-box::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 33%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(0, 229, 255, 0.6),
+    transparent
+  );
+  animation: borderSlideX 3s linear infinite;
+  z-index: 0;
+  pointer-events: none;
+}
+
+@keyframes borderSlideX {
+  0%   { left: -33%; }
+  100% { left: 130%; }
+}
+
+/* Remove the old orb */
+.city-box::after {
+  display: none;
+}
+.location {
+  background: rgba(5, 3, 12, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 22px;
+  padding: 22px 32px;
 }
 
 .location .city {
-  color: #fff;
-  font-size: 32px;
-  font-weight: 500;
-  margin-bottom: 5px;
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, #fff 30%, rgba(0,229,255,0.9));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: cityGlow 4s ease-in-out infinite;
+}
+
+@keyframes cityGlow {
+  0%, 100% { filter: drop-shadow(0 0 8px rgba(0,229,255,0.3)); }
+  50%       { filter: drop-shadow(0 0 20px rgba(0,229,255,0.7)); }
 }
 
 .location .date {
-  color: #fff;
-  font-size: 16px;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-dim);
+  margin-top: 5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
+/* ─── TEMPERATURE ─── */
 .current .temp {
-  color: #fff;
-  font-size: 102px;
+  font-size: 120px;
   font-weight: 900;
-  margin: 30px 0px;
-  text-shadow: 2px 10px rgba(0, 0, 0, 0.6);
+  line-height: 1;
+  letter-spacing: -6px;
+  color: #fff;
+  display: inline-block;
+  animation: tempFloat 6s ease-in-out infinite, tempEntrance 0.8s cubic-bezier(0.34,1.56,0.64,1) both;
+  text-shadow:
+    0 0 60px rgba(255,255,255,0.15),
+    0 20px 60px rgba(0,0,0,0.5);
+}
+
+@keyframes tempFloat {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.03); }
+}
+
+@keyframes tempEntrance {
+  from { opacity: 0; transform: scale(0.7) translateY(30px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
 }
 
 .current .temp span {
-  font-weight: 500;
+  font-size: 48px;
+  font-weight: 300;
+  letter-spacing: 0;
+  opacity: 0.8;
 }
 
+/* ─── WEATHER ROW ─── */
 .current .weather {
-  color: #fff;
-  font-size: 32px;
-  font-weight: 700;
-  font-style: italic;
-  margin-bottom: 15px;
-  text-shadow: 0px 3px rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 4px 0;
+  animation: slideUp 0.7s ease both;
+  animation-delay: 0.1s;
 }
 
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.weather-emoji {
+  font-size: 36px;
+  display: inline-block;
+  animation: emojiSpin 8s linear infinite;
+  filter: drop-shadow(0 0 10px rgba(255,220,80,0.5));
+}
+
+@keyframes emojiSpin {
+  0%,100% { transform: rotate(-5deg) scale(1); }
+  50%      { transform: rotate(5deg) scale(1.1); }
+}
+
+.weather-text {
+  font-size: 30px;
+  font-weight: 600;
+  font-style: italic;
+  color: rgba(255,255,255,0.92);
+  letter-spacing: -0.3px;
+}
+
+/* ─── HI-LOW ─── */
 .current .hi-low {
-  color: #fff;
-  font-size: 24px;
-  font-weight: 500;
-  text-shadow: 0px 4px rgba(0, 0, 0, 0.4);
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--text-dim);
+  letter-spacing: 0.08em;
+  animation: slideUp 0.7s ease both;
+  animation-delay: 0.2s;
+}
+
+/* ─── GLASS CARD extra info (if you want to add it) ─── */
+.glass-card {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 16px;
+  padding: 16px 24px;
 }
